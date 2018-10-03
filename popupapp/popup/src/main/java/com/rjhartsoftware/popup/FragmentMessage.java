@@ -88,15 +88,8 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder;
         //noinspection ConstantConditions
-        if (getArguments().getInt(ARG_STYLE, 0) != 0) {
-            //noinspection ConstantConditions
-            builder = new AlertDialog.Builder(getActivity(), getArguments().getInt(ARG_STYLE));
-        } else {
-            //noinspection ConstantConditions
-            builder = new AlertDialog.Builder(getActivity());
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), getArguments().getInt(ARG_STYLE));
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogInterface = inflater.inflate(R.layout.fragment_dialog_message, null);
         TextView title = dialogInterface.findViewById(R.id.message_title);
@@ -175,6 +168,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                 mResources = null;
             }
             mArguments.putString(ARG_REQUEST_TAG, requestId);
+            mArguments.putInt(ARG_STYLE, R.style.AlertDialogTheme);
         }
 
         public Builder(Resources resources, String requestId) {
