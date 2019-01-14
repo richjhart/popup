@@ -452,4 +452,8 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 }

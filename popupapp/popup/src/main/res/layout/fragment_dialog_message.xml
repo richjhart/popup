@@ -21,6 +21,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/message_message_scroll"
         android:layout_width="match_parent"
+        android:scrollbars="vertical"
         android:layout_height="wrap_content">
 
         <LinearLayout

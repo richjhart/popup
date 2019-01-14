@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
             FragmentTransactions
                     .beginTransaction(this)
                     .add(builder.getFragment(), builder.getTag())
+                    .addToBackStack(null)
                     .dontDuplicateTag()
                     .commit();
 
