@@ -1,7 +1,8 @@
 package com.rjhartsoftware.popupapp;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.rjhartsoftware.fragments.FragmentTransactions;
 import com.rjhartsoftware.logcatdebug.D;
@@ -36,6 +37,48 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .style(R.style.Alert)
                     .transparent()
                     .message("This is the second message");
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
+
+            builder = new FragmentMessage.Builder(this, "third")
+                    .allowCancel(false)
+                    .allowCancelOnTouchOutside(false)
+                    .positiveButton("OK")
+                    .title("Scrollable message")
+                    .message("This message will scroll<br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>At least it should")
+                    //.message("This message will scroll<br><br><br><br>At least it should")
+                    .checkBox("Checkbox", false)
+                    .mustViewAll();
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
+
+            builder = new FragmentMessage.Builder(this, "fourth")
+                    .allowCancel(false)
+                    .allowCancelOnTouchOutside(false)
+                    .positiveButton("OK")
+                    .title("Scrollable message")
+                    .message("This message will scroll<br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>At least it should")
+                    //.message("This message will scroll<br><br><br><br>At least it should")
+                    .mustViewAll("More");
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
+
+            builder = new FragmentMessage.Builder(this, "fifth")
+                    .allowCancel(false)
+                    .allowCancelOnTouchOutside(false)
+                    .positiveButton("OK")
+                    .title("Non-scrollable message")
+                    .message("This message will not scroll<br><br><br><br>.")
+                    .mustViewAll("More");
             FragmentTransactions
                     .beginTransaction(this)
                     .add(builder.getFragment(), builder.getTag())

@@ -6,14 +6,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.annotation.StyleRes;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -22,10 +14,21 @@ import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 public class FragmentMessage extends DialogFragment implements DialogInterface.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
@@ -80,6 +83,8 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     private static final String ARG_CHECKBOX_RESULT = "checkbox_result";
     private static final String ARG_STYLE = "style";
     private static final String ARG_TRANSPARENT = "transparent";
+    private static final String ARG_MUST_VIEW_ALL = "must_view_all";
+    private static final String ARG_MUST_VIEW_ALL_MORE = "must_view_all_more";
 
     public FragmentMessage() {
     }
@@ -88,7 +93,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        //noinspection ConstantConditions
+        assert getArguments() != null;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), getArguments().getInt(ARG_STYLE));
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogInterface = inflater.inflate(R.layout.fragment_dialog_message, null);
@@ -137,17 +142,61 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         builder.setCancelable(getArguments().getBoolean(ARG_CANCEL));
         AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(getArguments().getBoolean(ARG_CANCEL_TOUCH));
-        if (getArguments().getBoolean(ARG_TRANSPARENT)) {
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                assert getArguments() != null;
+                if (getArguments().getBoolean(ARG_TRANSPARENT)) {
                     if (((AlertDialog) dialog).getWindow() != null) {
                         //noinspection ConstantConditions
                         ((AlertDialog) dialog).getWindow().getDecorView().setBackgroundResource(android.R.color.transparent);
                     }
                 }
-            });
-        }
+                NestedScrollView sv = ((AlertDialog) dialog).findViewById(R.id.message_message_scroll);
+                sv.setTag(false);
+                if (getArguments().getBoolean(ARG_MUST_VIEW_ALL)) {
+                    Button ok = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                    if (ok != null) {
+                        sv.setTag(true);
+                        if (getArguments().getString(ARG_MUST_VIEW_ALL_MORE) == null) {
+                            ok.setEnabled(false);
+                        } else {
+                            ok.setEnabled(true);
+                            ok.setText(getArguments().getString(ARG_MUST_VIEW_ALL_MORE));
+                        }
+                        if (sv.canScrollVertically(1)) {
+                            sv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                                @Override
+                                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                                    if (!v.canScrollVertically(1)) {
+                                        ok.setEnabled(true);
+                                        sv.setTag(false);
+                                        ok.setText(getArguments().getString(ARG_POSITIVE_BUTTON));
+                                    }
+                                }
+                            });
+                            if (getArguments().getString(ARG_MUST_VIEW_ALL_MORE) != null) {
+                                ok.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if ((boolean) sv.getTag()) {
+                                            sv.pageScroll(View.FOCUS_DOWN);
+                                        } else {
+                                            FragmentMessage.this.onClick(dialog, AlertDialog.BUTTON_POSITIVE);
+                                            dialog.cancel();
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            ok.setEnabled(true);
+                            sv.setTag(false);
+                            ok.setText(getArguments().getString(ARG_POSITIVE_BUTTON));
+                        }
+                    }
+                }
+            }
+        });
         return dialog;
     }
 
@@ -289,6 +338,23 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
 
         public Builder input(String query) {
             mArguments.putString(ARG_INPUT, query);
+            return this;
+        }
+
+        public Builder mustViewAll() {
+            mArguments.putBoolean(ARG_MUST_VIEW_ALL, true);
+            return this;
+        }
+
+        public Builder mustViewAll(String moreButton) {
+            mArguments.putBoolean(ARG_MUST_VIEW_ALL, true);
+            mArguments.putString(ARG_MUST_VIEW_ALL_MORE, moreButton);
+            return this;
+        }
+
+        public Builder checkBox(String message, boolean checked) {
+            mArguments.putBoolean(ARG_CHECKBOX_RESULT, checked);
+            mArguments.putString(ARG_CHECKBOX, message);
             return this;
         }
 
