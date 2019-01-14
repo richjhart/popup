@@ -183,7 +183,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                                             sv.pageScroll(View.FOCUS_DOWN);
                                         } else {
                                             FragmentMessage.this.onClick(dialog, AlertDialog.BUTTON_POSITIVE);
-                                            dialog.cancel();
+                                            dialog.dismiss();
                                         }
                                     }
                                 });

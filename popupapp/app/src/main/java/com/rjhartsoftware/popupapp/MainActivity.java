@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
+                    .negativeButton("Cancel")
                     .title("Scrollable message")
                     .message("This message will scroll<br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>.<br><br><br><br><br><br>At least it should")
                     //.message("This message will scroll<br><br><br><br>At least it should")
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
 
     @Override
     public void onMessageDone(int which, String requestTag, Bundle args) {
-        D.log(D.GENERAL, "Message closed: " + requestTag);
+        D.log(D.GENERAL, "Message closed: " + requestTag + ". which: " + which);
     }
 
     @Override
