@@ -101,7 +101,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         CharSequence title_text = Html.fromHtml(getArguments().getString(ARG_TITLE, ""));
         title.setText(title_text);
         TextView message = dialogInterface.findViewById(R.id.message_message);
-        CharSequence msg_text = Html.fromHtml(getArguments().getString(ARG_MESSAGE, ""));
+        CharSequence msg_text = FromHtml.fromHtml(getArguments().getString(ARG_MESSAGE, ""));
         message.setText(msg_text);
         MovementMethod m = message.getMovementMethod();
         if (!(m instanceof LinkMovementMethod)) {
@@ -429,7 +429,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
+    public void onCancel(@NonNull DialogInterface dialog) {
         onClick(dialog, DialogInterface.BUTTON_NEGATIVE);
     }
 

@@ -86,6 +86,22 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .add(builder.getFragment(), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
+
+            String raw_html = getString(R.string.raw_html);
+            builder = new FragmentMessage.Builder(this, "sixth")
+                    .allowCancel(false)
+                    .allowCancelOnTouchOutside(false)
+                    .positiveButton("OK")
+                    .title("Non-scrollable message")
+                    .message(raw_html)
+                    .mustViewAll("More");
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
+
+
         }
     }
 
