@@ -54,7 +54,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
 
     @SuppressWarnings({"unused", "SameReturnValue"})
     public interface MessageCallback {
-        void onMessageDone(int which, String requestTag, Bundle args);
+        void onMessageDone(int which, String requestTag, Result args);
 
         default void onCheckBoxChanged(FragmentMessage fragment, boolean checked) {
 
@@ -400,7 +400,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                 callback = findFragment(getFragmentManager(), tag);
             }
             if (callback != null) {
-                callback.onMessageDone(which, getArguments().getString(ARG_REQUEST_TAG), getArguments());
+                callback.onMessageDone(which, getArguments().getString(ARG_REQUEST_TAG), new Result(getArguments()));
             }
         }
     }
@@ -455,5 +455,25 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    public static class Result {
+        private final Bundle mBundle;
+
+        private Result(Bundle bundle) {
+            mBundle = bundle;
+        }
+
+        public Bundle b() {
+            return mBundle;
+        }
+
+        public boolean checkboxResult() {
+            return mBundle.getBoolean(ARG_CHECKBOX_RESULT, false);
+        }
+
+        public String inputResult() {
+            return mBundle.getString(ARG_INPUT_RESULT, "");
+        }
     }
 }

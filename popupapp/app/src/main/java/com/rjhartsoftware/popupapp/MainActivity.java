@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
     }
 
     @Override
-    public void onMessageDone(int which, String requestTag, Bundle args) {
+    public void onMessageDone(int which, String requestTag, FragmentMessage.Result args) {
         D.log(D.GENERAL, "Message closed: " + requestTag + ". which: " + which);
     }
 
