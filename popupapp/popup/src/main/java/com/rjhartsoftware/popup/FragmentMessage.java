@@ -344,6 +344,12 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
+        public Builder input(String query, String initial) {
+            mArguments.putString(ARG_INPUT, query);
+            mArguments.putString(ARG_INPUT_RESULT, initial);
+            return this;
+        }
+
         public Builder mustViewAll() {
             mArguments.putBoolean(ARG_MUST_VIEW_ALL, true);
             return this;
