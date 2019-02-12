@@ -20,11 +20,14 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.rjhartsoftware.fragments.FragmentTransactions;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -369,6 +372,14 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return TAG + mArguments.getString(ARG_REQUEST_TAG);
         }
 
+        public void show(@Nullable AppCompatActivity activity) {
+            if (activity == null) {
+                return;
+            }
+            FragmentTransactions.beginTransaction(activity)
+                    .add(getFragment(), getTag())
+                    .commit();
+        }
     }
 
     @Override
