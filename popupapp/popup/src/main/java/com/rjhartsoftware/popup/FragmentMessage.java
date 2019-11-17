@@ -477,7 +477,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     public static class Result {
         private final Bundle mBundle;
 
-        private Result(Bundle bundle) {
+        public Result(Bundle bundle) {
             mBundle = bundle;
         }
 
