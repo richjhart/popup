@@ -28,10 +28,13 @@ import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY;
 
 public class FragmentMessage extends DialogFragment implements DialogInterface.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
@@ -477,7 +480,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     public static class Result {
         private final Bundle mBundle;
 
-        private Result(Bundle bundle) {
+        public Result(Bundle bundle) {
             mBundle = bundle;
         }
 
