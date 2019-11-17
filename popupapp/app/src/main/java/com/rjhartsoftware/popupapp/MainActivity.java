@@ -101,12 +101,6 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .dontDuplicateTag()
                     .commit();
 
-            new FragmentMessage.Builder(this, "seventh")
-                    .message("Long buttons")
-                    .inactivePositiveButton("This is a long positive button")
-                    .inactiveNegativeButton("This is a long negative button")
-                    .inactiveNeutralButton("This is a long neutral button")
-                    .show(this);
 
         }
     }
