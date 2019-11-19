@@ -18,10 +18,11 @@
         android:textStyle="bold"
         tools:ignore="SelectableText" />
 
-    <androidx.core.widget.NestedScrollView
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/message_message_scroll"
         android:layout_width="match_parent"
         android:scrollbars="vertical"
+        android:layout_weight="1"
         android:layout_height="wrap_content">
 
         <LinearLayout
@@ -37,6 +38,7 @@
                 android:padding="8dp"
                 android:autoLink="web"
                 android:linksClickable="true"
+                tools:text="\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHello"
                 android:textSize="16sp"
                 android:textStyle="normal"
                 tools:ignore="SelectableText" />
@@ -58,16 +60,16 @@
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:id="@+id/buttonPanel"
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
         android:scrollIndicators="top|bottom">
-        <androidx.appcompat.widget.ButtonBarLayout
+        <android.support.v7.widget.ButtonBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom"
@@ -82,7 +84,7 @@
                 style="?attr/buttonBarNeutralButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <android.widget.Space
+            <android.support.v4.widget.Space
                 android:id="@+id/spacer"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -98,7 +100,7 @@
                 style="?attr/buttonBarPositiveButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-        </androidx.appcompat.widget.ButtonBarLayout>
+        </android.support.v7.widget.ButtonBarLayout>
     </ScrollView>
 
 </LinearLayout>

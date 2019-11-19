@@ -6,6 +6,16 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -21,17 +31,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rjhartsoftware.fragments.FragmentTransactions;
+import com.rjhartsoftware.logcatdebug.D;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.annotation.StyleRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import java.lang.reflect.Method;
 
 public class FragmentMessage extends DialogFragment implements DialogInterface.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
@@ -42,7 +44,6 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        //noinspection ConstantConditions
         getArguments().putString(ARG_INPUT_RESULT, s.toString());
         AlertDialog ad = (AlertDialog) getDialog();
         if (ad != null) {
@@ -92,6 +93,14 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     public FragmentMessage() {
     }
 
+    private String getStringArgument(String key) {
+        String val = getArguments().getString(key);
+        if (val == null) {
+            return "";
+        }
+        return val;
+    }
+
     @SuppressLint("InflateParams")
     @NonNull
     @Override
@@ -101,10 +110,10 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogInterface = inflater.inflate(R.layout.fragment_dialog_message, null);
         TextView title = dialogInterface.findViewById(R.id.message_title);
-        CharSequence title_text = Html.fromHtml(getArguments().getString(ARG_TITLE, ""));
+        CharSequence title_text = Html.fromHtml(getStringArgument(ARG_TITLE));
         title.setText(title_text);
         TextView message = dialogInterface.findViewById(R.id.message_message);
-        CharSequence msg_text = FromHtml.fromHtml(getArguments().getString(ARG_MESSAGE, ""));
+        CharSequence msg_text = FromHtml.fromHtml(getStringArgument(ARG_MESSAGE));
         message.setText(msg_text);
         MovementMethod m = message.getMovementMethod();
         if (!(m instanceof LinkMovementMethod)) {
@@ -155,7 +164,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                         ((AlertDialog) dialog).getWindow().getDecorView().setBackgroundResource(android.R.color.transparent);
                     }
                 }
-                NestedScrollView sv = ((AlertDialog) dialog).findViewById(R.id.message_message_scroll);
+                NestedScrollView sv = (NestedScrollView) ((AlertDialog) dialog).findViewById(R.id.message_message_scroll);
                 sv.setTag(false);
                 if (getArguments().getBoolean(ARG_MUST_VIEW_ALL)) {
                     Button ok = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
@@ -167,11 +176,11 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                             ok.setEnabled(true);
                             ok.setText(getArguments().getString(ARG_MUST_VIEW_ALL_MORE));
                         }
-                        if (sv.canScrollVertically(1)) {
+                        if (canScrollDown(sv)) {
                             sv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
                                 @Override
                                 public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                                    if (!v.canScrollVertically(1)) {
+                                    if (!canScrollDown(v)) {
                                         ok.setEnabled(true);
                                         sv.setTag(false);
                                         ok.setText(getArguments().getString(ARG_POSITIVE_BUTTON));
@@ -201,6 +210,20 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             }
         });
         return dialog;
+    }
+
+    private boolean canScrollDown(NestedScrollView view) {
+        try {
+            Method offsetM = NestedScrollView.class.getDeclaredMethod("computeVerticalScrollOffset");
+            Method rangeM = NestedScrollView.class.getDeclaredMethod("computeVerticalScrollRange");
+            Method extentM = NestedScrollView.class.getDeclaredMethod("computeVerticalScrollExtent");
+            final int offset = (int) offsetM.invoke(view);
+            final int range = (int) rangeM.invoke(view) - (int)extentM.invoke(view);
+            if (range == 0) return false;
+            return offset < range - 1;
+        } catch (Exception ignore) {
+            return false;
+        }
     }
 
     @SuppressWarnings({"unused", "UnusedReturnValue", "WeakerAccess"})
@@ -490,7 +513,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         }
 
         public String inputResult() {
-            return mBundle.getString(ARG_INPUT_RESULT, "");
+            return mBundle.getString(ARG_INPUT_RESULT);
         }
     }
 }
