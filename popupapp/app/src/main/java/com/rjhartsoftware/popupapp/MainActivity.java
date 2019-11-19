@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
-                    .title("Non-scrollable message")
+                    .title("Must-scroll message")
                     .message(raw_html)
                     .mustViewAll("More");
             FragmentTransactions
