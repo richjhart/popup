@@ -20,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.rjhartsoftware.fragments.FragmentTransactions;
 
 import androidx.annotation.NonNull;
@@ -82,6 +83,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     private static final String ARG_REQUEST_TAG = "tag";
     private static final String ARG_INPUT = "input";
     private static final String ARG_INPUT_RESULT = "input_result";
+    private static final String ARG_INPUT_TYPE = "input_type";
     private static final String ARG_CHECKBOX = "checkbox";
     private static final String ARG_CHECKBOX_RESULT = "checkbox_result";
     private static final String ARG_STYLE = "style";
@@ -121,11 +123,15 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             checkbox.setVisibility(View.GONE);
         }
         EditText edit = dialogInterface.findViewById(R.id.message_input);
+        TextInputLayout edit_layout = dialogInterface.findViewById(R.id.message_input_hint);
         if (getArguments().getString(ARG_INPUT) != null) {
-            edit.setHint(getArguments().getString(ARG_INPUT));
+            edit_layout.setHint(getArguments().getString(ARG_INPUT));
             if (getArguments().getString(ARG_INPUT_RESULT) != null) {
                 edit.setText(getArguments().getString(ARG_INPUT_RESULT));
                 edit.setSelection(0, edit.getText().length());
+            }
+            if (getArguments().containsKey(ARG_INPUT_TYPE)) {
+                edit.setInputType(getArguments().getInt(ARG_INPUT_TYPE));
             }
             edit.addTextChangedListener(this);
         } else {
@@ -339,6 +345,12 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
+        public Builder input(String query, int type) {
+            mArguments.putString(ARG_INPUT, query);
+            mArguments.putInt(ARG_INPUT_TYPE, type);
+            return this;
+        }
+
         public Builder input(String query) {
             mArguments.putString(ARG_INPUT, query);
             return this;
@@ -347,6 +359,13 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         public Builder input(String query, String initial) {
             mArguments.putString(ARG_INPUT, query);
             mArguments.putString(ARG_INPUT_RESULT, initial);
+            return this;
+        }
+
+        public Builder input(String query, String initial, int type) {
+            mArguments.putString(ARG_INPUT, query);
+            mArguments.putString(ARG_INPUT_RESULT, initial);
+            mArguments.putInt(ARG_INPUT_TYPE, type);
             return this;
         }
 

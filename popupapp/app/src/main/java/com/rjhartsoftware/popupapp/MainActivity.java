@@ -1,6 +1,7 @@
 package com.rjhartsoftware.popupapp;
 
 import android.os.Bundle;
+import android.text.InputType;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,17 +19,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            FragmentMessage.Builder builder = new FragmentMessage.Builder(this, "first")
-                    .allowCancel(false)
-                    .inactiveNegativeButton("Cancel")
-                    .positiveButton("OK")
-                    .message("This is the first message")
-                    .input("What do you want to return?");
-            FragmentTransactions
-                    .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
-                    .dontDuplicateTag()
-                    .commit();
+            FragmentMessage.Builder builder;
 
             builder = new FragmentMessage.Builder(this, "second")
                     .allowCancel(false)
@@ -107,6 +98,30 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .inactiveNegativeButton("This is a long negative button")
                     .inactiveNeutralButton("This is a long neutral button")
                     .show(this);
+
+            builder = new FragmentMessage.Builder(this, "first")
+                    .allowCancel(false)
+                    .inactiveNegativeButton("Cancel")
+                    .positiveButton("OK")
+                    .message("This is the first message")
+                    .input("What do you want to return?");
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
+
+            builder = new FragmentMessage.Builder(this, "email")
+                    .allowCancel(false)
+                    .inactiveNegativeButton("Cancel")
+                    .positiveButton("OK")
+                    .message("This is the first message")
+                    .input("Email address", InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            FragmentTransactions
+                    .beginTransaction(this)
+                    .add(builder.getFragment(), builder.getTag())
+                    .dontDuplicateTag()
+                    .commit();
         }
     }
 
