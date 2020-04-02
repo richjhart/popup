@@ -31,7 +31,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rjhartsoftware.fragments.FragmentTransactions;
-import com.rjhartsoftware.logcatdebug.D;
 
 import java.lang.reflect.Method;
 
@@ -83,6 +82,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     private static final String ARG_REQUEST_TAG = "tag";
     private static final String ARG_INPUT = "input";
     private static final String ARG_INPUT_RESULT = "input_result";
+    private static final String ARG_INPUT_TYPE = "input_type";
     private static final String ARG_CHECKBOX = "checkbox";
     private static final String ARG_CHECKBOX_RESULT = "checkbox_result";
     private static final String ARG_STYLE = "style";
@@ -110,18 +110,24 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogInterface = inflater.inflate(R.layout.fragment_dialog_message, null);
         TextView title = dialogInterface.findViewById(R.id.message_title);
-        CharSequence title_text = Html.fromHtml(getStringArgument(ARG_TITLE));
+        CharSequence title_text = getArguments().getCharSequence(ARG_TITLE);
+        if (title_text instanceof String) {
+            title_text = Html.fromHtml((String) title_text);
+        }
         title.setText(title_text);
         TextView message = dialogInterface.findViewById(R.id.message_message);
-        CharSequence msg_text = FromHtml.fromHtml(getStringArgument(ARG_MESSAGE));
+        CharSequence msg_text = getArguments().getCharSequence(ARG_MESSAGE);
+        if (msg_text instanceof String) {
+            msg_text = FromHtml.fromHtml((String) msg_text);
+        }
         message.setText(msg_text);
         MovementMethod m = message.getMovementMethod();
         if (!(m instanceof LinkMovementMethod)) {
             message.setMovementMethod(LinkMovementMethod.getInstance());
         }
         CheckBox checkbox = dialogInterface.findViewById(R.id.message_checkbox);
-        if (getArguments().getString(ARG_CHECKBOX) != null) {
-            checkbox.setText(getArguments().getString(ARG_CHECKBOX));
+        if (getArguments().getCharSequence(ARG_CHECKBOX) != null) {
+            checkbox.setText(getArguments().getCharSequence(ARG_CHECKBOX));
             if (getArguments().getBoolean(ARG_CHECKBOX_RESULT, false)) {
                 checkbox.setChecked(true);
             }
@@ -135,6 +141,9 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             if (getArguments().getString(ARG_INPUT_RESULT) != null) {
                 edit.setText(getArguments().getString(ARG_INPUT_RESULT));
                 edit.setSelection(0, edit.getText().length());
+            }
+            if (getArguments().containsKey(ARG_INPUT_TYPE)) {
+                edit.setInputType(getArguments().getInt(ARG_INPUT_TYPE));
             }
             edit.addTextChangedListener(this);
         } else {
@@ -218,7 +227,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             Method rangeM = NestedScrollView.class.getDeclaredMethod("computeVerticalScrollRange");
             Method extentM = NestedScrollView.class.getDeclaredMethod("computeVerticalScrollExtent");
             final int offset = (int) offsetM.invoke(view);
-            final int range = (int) rangeM.invoke(view) - (int)extentM.invoke(view);
+            final int range = (int) rangeM.invoke(view) - (int) extentM.invoke(view);
             if (range == 0) return false;
             return offset < range - 1;
         } catch (Exception ignore) {
@@ -254,7 +263,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         private Builder setString(String which, @StringRes int value, Object... format) {
             if (mResources != null) {
                 try {
-                    mArguments.putString(which, String.format(mResources.getString(value), format));
+                    mArguments.putCharSequence(which, String.format(mResources.getString(value), format));
                 } catch (Exception ignore) {
 
                 }
@@ -262,8 +271,8 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
-        private Builder setString(String which, String value) {
-            mArguments.putString(which, value);
+        private Builder setString(String which, CharSequence value) {
+            mArguments.putCharSequence(which, value);
             return this;
         }
 
@@ -271,7 +280,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return setString(ARG_TITLE, title, format);
         }
 
-        public Builder title(String title) {
+        public Builder title(CharSequence title) {
             return setString(ARG_TITLE, title);
         }
 
@@ -279,7 +288,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return setString(ARG_MESSAGE, message, format);
         }
 
-        public Builder message(String message) {
+        public Builder message(CharSequence message) {
             return setString(ARG_MESSAGE, message);
         }
 
@@ -362,6 +371,12 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
+        public Builder input(String query, int type) {
+            mArguments.putString(ARG_INPUT, query);
+            mArguments.putInt(ARG_INPUT_TYPE, type);
+            return this;
+        }
+
         public Builder input(String query) {
             mArguments.putString(ARG_INPUT, query);
             return this;
@@ -370,6 +385,13 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         public Builder input(String query, String initial) {
             mArguments.putString(ARG_INPUT, query);
             mArguments.putString(ARG_INPUT_RESULT, initial);
+            return this;
+        }
+
+        public Builder input(String query, String initial, int type) {
+            mArguments.putString(ARG_INPUT, query);
+            mArguments.putString(ARG_INPUT_RESULT, initial);
+            mArguments.putInt(ARG_INPUT_TYPE, type);
             return this;
         }
 
@@ -384,9 +406,9 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
-        public Builder checkBox(String message, boolean checked) {
+        public Builder checkBox(CharSequence message, boolean checked) {
             mArguments.putBoolean(ARG_CHECKBOX_RESULT, checked);
-            mArguments.putString(ARG_CHECKBOX, message);
+            mArguments.putCharSequence(ARG_CHECKBOX, message);
             return this;
         }
 
