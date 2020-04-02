@@ -141,6 +141,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             }
             edit.addTextChangedListener(this);
         } else {
+            edit_layout.setVisibility(View.GONE);
             edit.setVisibility(View.GONE);
         }
         builder.setView(dialogInterface);
