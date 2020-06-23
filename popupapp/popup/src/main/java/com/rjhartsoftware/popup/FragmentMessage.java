@@ -424,6 +424,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             }
             FragmentTransactions.beginTransaction(activity)
                     .add(getFragment(activity), getTag())
+                    .dontDuplicateTag()
                     .commit();
         }
     }
