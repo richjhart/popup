@@ -1,10 +1,9 @@
 package com.rjhartsoftware.popup;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -20,9 +19,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.material.textfield.TextInputLayout;
-import com.rjhartsoftware.fragments.FragmentTransactions;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -32,7 +28,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.textfield.TextInputLayout;
+import com.rjhartsoftware.fragments.FragmentTransactions;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FragmentMessage extends DialogFragment implements DialogInterface.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
@@ -56,20 +59,9 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
 
     }
 
-    @SuppressWarnings({"unused", "SameReturnValue"})
-    public interface MessageCallback {
-        void onMessageDone(int which, String requestTag, Result args);
-
-        default void onCheckBoxChanged(FragmentMessage fragment, boolean checked) {
-
-        }
-
-        String getTag();
-    }
-
     private static final String TAG = "_frag_message.";
-    private static final String ARG_CALLBACK = "callback";
-    private static final String ARG_CALLBACK_ACTIVITY = "callback_activity";
+    //    private static final String ARG_RESULT_CLASS = "class";
+//    private static final String ARG_CHECKBOX_CHANGED_CLASS = "checkbox_class";
     private static final String ARG_TITLE = "title";
     private static final String ARG_MESSAGE = "message";
     private static final String ARG_POSITIVE_BUTTON = "positive";
@@ -82,10 +74,10 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     private static final String ARG_CANCEL_TOUCH = "allowCancelOnTouch";
     private static final String ARG_REQUEST_TAG = "tag";
     private static final String ARG_INPUT = "input";
-    private static final String ARG_INPUT_RESULT = "input_result";
+    static final String ARG_INPUT_RESULT = "input_result";
     private static final String ARG_INPUT_TYPE = "input_type";
     private static final String ARG_CHECKBOX = "checkbox";
-    private static final String ARG_CHECKBOX_RESULT = "checkbox_result";
+    static final String ARG_CHECKBOX_RESULT = "checkbox_result";
     private static final String ARG_STYLE = "style";
     private static final String ARG_TRANSPARENT = "transparent";
     private static final String ARG_MUST_VIEW_ALL = "must_view_all";
@@ -216,39 +208,51 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         return dialog;
     }
 
+    private static class SavedString {
+        private final String which;
+        @StringRes
+        private final int res;
+        private final Object[] args;
+
+        private SavedString(String which, @StringRes int res, Object... args) {
+            this.which = which;
+            this.res = res;
+            this.args = args;
+        }
+
+        private void process(Bundle bundle, Context context) {
+            bundle.putString(which, String.format(context.getString(res), args));
+        }
+    }
+
+    private static int sAutoRequestId = 0;
+
     @SuppressWarnings({"unused", "UnusedReturnValue", "WeakerAccess"})
     public static class Builder {
 
-        private final Resources mResources;
         private final Bundle mArguments = new Bundle();
+        private final List<SavedString> mStrings = new ArrayList<>();
 
-        public Builder(MessageCallback callback, String requestId) {
-            if (callback instanceof Activity) {
-                mArguments.putString(ARG_CALLBACK, ARG_CALLBACK_ACTIVITY);
-                mResources = ((Activity) callback).getResources();
-            } else if (callback instanceof Fragment) {
-                mArguments.putString(ARG_CALLBACK, callback.getTag());
-                mResources = ((Fragment) callback).getResources();
-            } else {
-                mResources = null;
+        public Builder() {
+            this(/*null,*/ null);
+        }
+
+        public Builder(/*Class<? extends PopupResult> callback,*/ String requestId) {
+//            if (callback == null) {
+//                callback = PopupResult.class;
+//            }
+            if (requestId == null) {
+                requestId = "_auto_" + sAutoRequestId;
+                sAutoRequestId++;
             }
+//            mArguments.putString(ARG_RESULT_CLASS, callback.getCanonicalName());
             mArguments.putString(ARG_REQUEST_TAG, requestId);
+//            mArguments.putString(ARG_CHECKBOX_CHANGED_CLASS, PopupCheckboxChanged.class.getCanonicalName());
             mArguments.putInt(ARG_STYLE, R.style.AlertDialogTheme);
         }
 
-        public Builder(Resources resources, String requestId) {
-            mResources = resources;
-            mArguments.putString(ARG_REQUEST_TAG, requestId);
-        }
-
         private Builder setString(String which, @StringRes int value, Object... format) {
-            if (mResources != null) {
-                try {
-                    mArguments.putCharSequence(which, String.format(mResources.getString(value), format));
-                } catch (Exception ignore) {
-
-                }
-            }
+            mStrings.add(new SavedString(which, value, format));
             return this;
         }
 
@@ -256,6 +260,11 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             mArguments.putCharSequence(which, value);
             return this;
         }
+
+//        public Builder onCheckboxChanged(Class<? extends PopupCheckboxChanged> callback) {
+//            mArguments.putString(ARG_CHECKBOX_CHANGED_CLASS, callback.getCanonicalName());
+//            return this;
+//        }
 
         public Builder title(@StringRes int title, Object... format) {
             return setString(ARG_TITLE, title, format);
@@ -393,7 +402,12 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
             return this;
         }
 
-        public Fragment getFragment() {
+        public Fragment getFragment(@NonNull Context context) {
+            for (SavedString ss : mStrings) {
+                ss.process(mArguments, context);
+            }
+            mStrings.clear();
+
             FragmentMessage frag = new FragmentMessage();
             frag.setArguments(mArguments);
             frag.setCancelable(mArguments.getBoolean(ARG_CANCEL));
@@ -409,7 +423,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                 return;
             }
             FragmentTransactions.beginTransaction(activity)
-                    .add(getFragment(), getTag())
+                    .add(getFragment(activity), getTag())
                     .commit();
         }
     }
@@ -434,41 +448,13 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                 }
                 break;
         }
-        String tag = getArguments().getString(ARG_CALLBACK);
-        if (tag != null) {
-            MessageCallback callback;
-            if (tag.equals(ARG_CALLBACK_ACTIVITY)) {
-                callback = (MessageCallback) getActivity();
-            } else {
-                callback = findFragment(getFragmentManager(), tag);
-            }
-            if (callback != null) {
-                callback.onMessageDone(which, getArguments().getString(ARG_REQUEST_TAG), new Result(getArguments()));
-            }
-        }
-    }
-
-    private static MessageCallback findFragment(@Nullable FragmentManager fragManager, String tag) {
-        if (fragManager != null) {
-            Fragment frag = fragManager.findFragmentByTag(tag);
-            if (frag instanceof MessageCallback) {
-                return (MessageCallback) frag;
-            } else if (frag != null) {
-                // a fragment is found, but it's the wrong type
-                return null;
-            } else {
-                fragManager.getFragments();
-                for (Fragment f : fragManager.getFragments()) {
-                    if (f.isAdded()) {
-                        frag = (Fragment) findFragment(f.getChildFragmentManager(), tag);
-                        if (frag != null) {
-                            return (MessageCallback) frag;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+        EventBus.getDefault().post(
+                new PopupResult(
+                        which,
+                        getArguments().getString(ARG_REQUEST_TAG),
+                        getArguments()
+                )
+        );
     }
 
     @Override
@@ -480,19 +466,13 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         //noinspection ConstantConditions
         getArguments().putBoolean(ARG_CHECKBOX_RESULT, isChecked);
-        String tag = getArguments().getString(ARG_CALLBACK);
-        if (tag != null) {
-            MessageCallback callback;
-            if (tag.equals(ARG_CALLBACK_ACTIVITY)) {
-                callback = (MessageCallback) getActivity();
-            } else {
-                callback = findFragment(getFragmentManager(), tag);
-            }
-            if (callback != null) {
-                callback.onCheckBoxChanged(this, isChecked);
-            }
-        }
-
+        EventBus.getDefault().post(
+                new PopupCheckboxChanged(
+                        isChecked,
+                        getArguments().getString(ARG_REQUEST_TAG),
+                        getArguments()
+                )
+        );
     }
 
     @Override
@@ -500,23 +480,4 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         super.onDetach();
     }
 
-    public static class Result {
-        private final Bundle mBundle;
-
-        public Result(Bundle bundle) {
-            mBundle = bundle;
-        }
-
-        public Bundle b() {
-            return mBundle;
-        }
-
-        public boolean checkboxResult() {
-            return mBundle.getBoolean(ARG_CHECKBOX_RESULT, false);
-        }
-
-        public String inputResult() {
-            return mBundle.getString(ARG_INPUT_RESULT, "");
-        }
-    }
 }

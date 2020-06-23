@@ -8,20 +8,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.rjhartsoftware.fragments.FragmentTransactions;
 import com.rjhartsoftware.logcatdebug.D;
 import com.rjhartsoftware.popup.FragmentMessage;
+import com.rjhartsoftware.popup.PopupCheckboxChanged;
+import com.rjhartsoftware.popup.PopupResult;
 
-public class MainActivity extends AppCompatActivity implements FragmentMessage.MessageCallback {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+public class MainActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         D.init(BuildConfig.VERSION_NAME, BuildConfig.DEBUG);
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         FragmentTransactions.activityCreated(this);
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
             FragmentMessage.Builder builder;
 
-            builder = new FragmentMessage.Builder(this, "second")
+            builder = new FragmentMessage.Builder("second")
                     .allowCancel(false)
                     .inactiveNegativeButton("Cancel")
                     .positiveButton("OK")
@@ -30,11 +38,11 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .message("This is the second message");
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
 
-            builder = new FragmentMessage.Builder(this, "third")
+            builder = new FragmentMessage.Builder("third")
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
@@ -45,11 +53,11 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .mustViewAll();
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
 
-            builder = new FragmentMessage.Builder(this, "fourth")
+            builder = new FragmentMessage.Builder("fourth")
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
@@ -60,12 +68,12 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .mustViewAll("More");
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .addToBackStack(null)
                     .dontDuplicateTag()
                     .commit();
 
-            builder = new FragmentMessage.Builder(this, "fifth")
+            builder = new FragmentMessage.Builder("fifth")
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
@@ -74,12 +82,12 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .mustViewAll("More");
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
 
             String raw_html = getString(R.string.raw_html);
-            builder = new FragmentMessage.Builder(this, "sixth")
+            builder = new FragmentMessage.Builder("sixth")
                     .allowCancel(false)
                     .allowCancelOnTouchOutside(false)
                     .positiveButton("OK")
@@ -88,18 +96,18 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .mustViewAll("More");
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
 
-            new FragmentMessage.Builder(this, "seventh")
+            new FragmentMessage.Builder("seventh")
                     .message("Long buttons")
                     .inactivePositiveButton("This is a long positive button")
                     .inactiveNegativeButton("This is a long negative button")
                     .inactiveNeutralButton("This is a long neutral button")
                     .show(this);
 
-            builder = new FragmentMessage.Builder(this, "first")
+            builder = new FragmentMessage.Builder("first")
                     .allowCancel(false)
                     .inactiveNegativeButton("Cancel")
                     .positiveButton("OK")
@@ -107,11 +115,11 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .input("What do you want to return?");
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
 
-            builder = new FragmentMessage.Builder(this, "email")
+            builder = new FragmentMessage.Builder("email")
                     .allowCancel(false)
                     .inactiveNegativeButton("Cancel")
                     .positiveButton("OK")
@@ -119,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
                     .input("Email address", InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
             FragmentTransactions
                     .beginTransaction(this)
-                    .add(builder.getFragment(), builder.getTag())
+                    .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
         }
@@ -152,16 +160,18 @@ public class MainActivity extends AppCompatActivity implements FragmentMessage.M
     @Override
     protected void onDestroy() {
         FragmentTransactions.activityDestroyed(this);
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
-    @Override
-    public void onMessageDone(int which, String requestTag, FragmentMessage.Result args) {
-        D.log(D.GENERAL, "Message closed: " + requestTag + ". which: " + which);
+    @Subscribe
+    public void onPopupResult(PopupResult result) {
+        D.log(D.GENERAL, "Message closed: " + result.request + ". which: " + result.b);
+
     }
 
-    @Override
-    public String getTag() {
-        return null;
+    @Subscribe
+    public void onPopupCheckboxChanged(PopupCheckboxChanged result) {
+        D.log(D.GENERAL, "Checkbox changed: " + result.request + ". checkbox: " + result.checkbox);
     }
 }
