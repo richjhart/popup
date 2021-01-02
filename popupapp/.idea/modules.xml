@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="popupapp/app" />
-      <module fileurl="file://$PROJECT_DIR$/popup/popup.iml" filepath="$PROJECT_DIR$/popup/popup.iml" group="popupapp/popup" />
-      <module fileurl="file://$PROJECT_DIR$/popupapp.iml" filepath="$PROJECT_DIR$/popupapp.iml" group="popupapp" />
+      <module fileurl="file://$PROJECT_DIR$/popupapp.iml" filepath="$PROJECT_DIR$/popupapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/popupapp.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/popupapp.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/popup/popupapp.popup.iml" filepath="$PROJECT_DIR$/.idea/modules/popup/popupapp.popup.iml" />
     </modules>
   </component>
 </project>
