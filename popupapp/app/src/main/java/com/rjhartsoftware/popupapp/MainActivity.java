@@ -6,6 +6,7 @@ import android.text.InputType;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.rjhartsoftware.fragments.FragmentTransactions;
+import com.rjhartsoftware.fragments.TransactionsActivity;
 import com.rjhartsoftware.logcatdebug.D;
 import com.rjhartsoftware.popup.FragmentMessage;
 import com.rjhartsoftware.popup.PopupCheckboxChanged;
@@ -14,7 +15,7 @@ import com.rjhartsoftware.popup.PopupResult;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends TransactionsActivity {
 
 
 
@@ -23,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         D.init(BuildConfig.VERSION_NAME, BuildConfig.DEBUG);
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-        FragmentTransactions.activityCreated(this);
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
@@ -134,32 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        FragmentTransactions.activityStarted(this);
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        FragmentTransactions.activityResumed(this);
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        FragmentTransactions.activityPaused(this);
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        FragmentTransactions.activityStopped(this);
-        super.onStop();
-    }
-
-    @Override
     protected void onDestroy() {
-        FragmentTransactions.activityDestroyed(this);
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
