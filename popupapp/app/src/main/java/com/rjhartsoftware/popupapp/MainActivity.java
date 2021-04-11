@@ -130,6 +130,11 @@ public class MainActivity extends TransactionsActivity {
                     .add(builder.getFragment(this), builder.getTag())
                     .dontDuplicateTag()
                     .commit();
+
+            new FragmentMessage.Builder("neutral")
+                    .neutralButton("Help")
+                    .neutralButtonShouldNotClose()
+                    .show(this);
         }
     }
 

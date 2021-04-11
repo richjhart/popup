@@ -82,6 +82,7 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
     private static final String ARG_TRANSPARENT = "transparent";
     private static final String ARG_MUST_VIEW_ALL = "must_view_all";
     private static final String ARG_MUST_VIEW_ALL_MORE = "must_view_all_more";
+    private static final String ARG_NEUTRAL_BUTTON_STAY_OPEN = "neutral_stay_open";
 
     public FragmentMessage() {
     }
@@ -162,6 +163,17 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
                 }
                 NestedScrollView sv = ((AlertDialog) dialog).findViewById(R.id.message_message_scroll);
                 sv.setTag(false);
+                if (getArguments().getBoolean(ARG_NEUTRAL_BUTTON_STAY_OPEN)) {
+                    Button neutral = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEUTRAL);
+                    if (neutral != null) {
+                        neutral.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                FragmentMessage.this.onClick(dialog, AlertDialog.BUTTON_NEUTRAL);
+                            }
+                        });
+                    }
+                }
                 if (getArguments().getBoolean(ARG_MUST_VIEW_ALL)) {
                     Button ok = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
                     if (ok != null) {
@@ -334,6 +346,11 @@ public class FragmentMessage extends DialogFragment implements DialogInterface.O
         public Builder inactiveNeutralButton(String label) {
             mArguments.putBoolean(ARG_NEUTRAL_BUTTON_INACTIVE, true);
             return setString(ARG_NEUTRAL_BUTTON, label);
+        }
+
+        public Builder neutralButtonShouldNotClose() {
+            mArguments.putBoolean(ARG_NEUTRAL_BUTTON_STAY_OPEN, true);
+            return this;
         }
 
         public Builder allowCancel(boolean allowCancel) {
